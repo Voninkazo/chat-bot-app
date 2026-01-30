@@ -1,0 +1,8 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "types": ["vite/client"], // gives you `import.meta.env` etc.
+  },
+  "include": ["src"],
+  "exclude": ["src/**/*.test.*", "src/**/*.spec.*"]
+}

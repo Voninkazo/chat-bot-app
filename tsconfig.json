@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    /* Language and Environment */
+    "target": "es2020", // use latest JS features
+    "lib": ["ES2020", "DOM"], // include DOM + modern JS APIs
+
+    /* Modules */
+    "module": "es2020", // Vite uses ESM
+    "moduleResolution": "bundler", // best for Vite, understands exports field
+    "resolveJsonModule": true, // allow import of JSON files
+    "allowSyntheticDefaultImports": true, // allow `import React from 'react'`
+    "esModuleInterop": true, // interop with CommonJS modules
+
+    /* JSX/React */
+    "jsx": "react-jsx", // React 17+ JSX transform
+
+    /* Type Checking */
+    "strict": true, // all strict checks
+    "noUnusedLocals": true, // warn on unused variables
+    "noUnusedParameters": true, // warn on unused function params
+    "noFallthroughCasesInSwitch": true, // safer switch handling
+
+    /* Emit */
+    "skipLibCheck": true, // skip checking node_modules types
+    "forceConsistentCasingInFileNames": true // case-sensitive imports
+  },
+
+  "include": ["vite.config.ts", "scripts"],
+  "exclude": ["node_modules", "dist"] // always ignore build output
+}
