@@ -4,17 +4,18 @@ import clsx from "clsx";
 type ButtonProps = {
   children: ReactNode;
   onClick?: () => void;
-  type?: "button" | "submit" | "reset";
+  type: 'submit' | 'reset' | 'button';
   variant?: "primary" | "secondary" | "outline" | "ghost";
   disabled?: boolean;
   className?: string;
   icon?: ReactNode;
 };
 
-const Button: React.FC<ButtonProps> = ({
+
+export const Button: React.FC<ButtonProps> = ({
   children,
   onClick,
-  type = "button",
+  type,
   variant = "primary",
   disabled = false,
   className,
@@ -36,6 +37,7 @@ const Button: React.FC<ButtonProps> = ({
       className={clsx(
         variantStyles[variant],
         disabled && "opacity-50 cursor-not-allowed",
+        "px-4 py-3 rounded-lg focus:outline-none transition-colors",
         className
       )}
     >
@@ -44,5 +46,3 @@ const Button: React.FC<ButtonProps> = ({
     </button>
   );
 };
-
-export default Button;

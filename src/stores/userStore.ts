@@ -36,14 +36,13 @@ const userStore = create((set, get) => ({
 
       const userData = await response.json();
       set({ user: userData, isAuthenticated: true, isLoading: false });
-    } catch (error) {
+    } catch {
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 
   // Handle OAuth callback - check if we're returning from Google OAuth
   handleOAuthCallback: async () => {
-    const urlParams = new URLSearchParams(window.location.search);
     const isOAuthCallback = window.location.pathname === '/auth/callback';
 
     if (isOAuthCallback) {

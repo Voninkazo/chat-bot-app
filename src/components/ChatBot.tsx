@@ -6,15 +6,7 @@ interface Message {
   content: string;
 }
 
-interface Song {
-  id: number;
-  title: string;
-  artist: string;
-  genre?: string;
-  mood?: string;
-  spotify_url?: string;
-  youtube_url?: string;
-}
+
 
 const Button = ({ onClick, className, children }) => (
   <button onClick={onClick} className={className}>
@@ -91,7 +83,7 @@ export const ChatBot = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex max-h-screen  flex-col bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
@@ -143,7 +135,7 @@ export const ChatBot = () => {
       )}
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto px-4 py-6">
+      <div className="overflow-y-auto px-4 py-6">
         <div className="max-w-3xl mx-auto space-y-4">
           {messages.length === 0 && (
             <div className="text-center text-gray-500 mt-8">
@@ -194,7 +186,7 @@ export const ChatBot = () => {
         </div>
       </div>
 
-      {/* Input Area */}
+      {/* ChatInput Area */}
       <div className="border-t border-gray-200 bg-white px-4 py-4">
         <div className="max-w-3xl mx-auto">
           <div className="flex gap-2">
