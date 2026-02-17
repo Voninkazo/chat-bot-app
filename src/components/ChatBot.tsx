@@ -6,8 +6,6 @@ interface Message {
   content: string;
 }
 
-
-
 const Button = ({ onClick, className, children }) => (
   <button onClick={onClick} className={className}>
     {children}
@@ -18,7 +16,7 @@ export const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [showSettings, setShowSettings] = useState(false);
-  const [apiUrl, setApiUrl] = useState("http://localhost:3001");
+  const [apiUrl, setApiUrl] = useState(import.meta.env.VITE_API_URL);
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
 
