@@ -17,7 +17,6 @@ export const Header = () => {
         <Link to="/" className="text-xl font-bold">
           ChatBot
         </Link>
-        
         <nav>
           <ul className="flex space-x-6 items-center">
             {isAuthenticated ? (
