@@ -8,7 +8,6 @@ import { Register } from "./pages/Register";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import {Admin} from "./pages/Admin";
-import {AuthCallback} from "./pages/AuthCallback";
 import userStore from "./stores/userStore";
 
 function App() {
@@ -24,8 +23,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/auth/callback" element={<AuthCallback />} />
-        
+
         <Route path="/" element={<Layout />}>
           <Route index element={<Homepage />} />
           <Route 
