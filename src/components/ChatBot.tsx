@@ -41,6 +41,7 @@ export const ChatBot = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify({
           message: currentInput,
           conversationHistory: messages.map((msg) => ({
