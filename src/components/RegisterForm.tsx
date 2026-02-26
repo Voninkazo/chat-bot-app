@@ -111,6 +111,19 @@ export const RegisterForm = () => {
           />
         </div>
 
+          <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Full Name
+          </label>
+          <Input
+            type="text"
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            required
+          />
+        </div>
+
         <Button
           type="submit"
           disabled={loading}
@@ -119,14 +132,15 @@ export const RegisterForm = () => {
           {loading ? "Processing..." : "Register"}
         </Button>
       </form>
-      <Button
-          type="button"
-        onClick={redirectToGoogleLogin}
-        className="mt-4 w-full flex items-center justify-center gap-3 bg-white border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
-      >
-        <GoogleIcon />
-        Sign in with Google
-      </Button>
+       <Button
+            type="button"
+            variant="outline"
+            onClick={redirectToGoogleLogin}
+            className="mt-4 w-full flex items-center justify-center gap-3"
+          >
+          <GoogleIcon />
+          <span>Sign up with Google</span>
+        </Button>
     </>
   );
 };

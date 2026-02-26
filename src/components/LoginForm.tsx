@@ -114,6 +114,11 @@ export const LoginForm = () => {
               placeholder="••••••••"
             />
           </div>
+         <div className="text-right mt-1">
+            <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+              Forgot password?
+            </a>
+         </div>
 
           <Button
             type="submit"

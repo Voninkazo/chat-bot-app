@@ -25,15 +25,16 @@ export const Login = () => {
 
         <LoginForm />
 
-        <div className="mt-8 text-center">
-          <p className="text-gray-600">
-            Don't have an account?{' '}
+        <div className="mt-8">
+          <div className="text-gray-600 flex justify-center gap-x-2">
+            <p>Don't have an account?</p>
             <button
+                className="underline text-indigo-600 font-semibold"
               onClick={() => navigate('/register')}
             >
               Sign up
             </button>
-          </p>
+          </div>
         </div>
       </div>
       </div>

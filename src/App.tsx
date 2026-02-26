@@ -8,6 +8,8 @@ import { Register } from "./pages/Register";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import {Admin} from "./pages/Admin";
+import { ForgotPassword } from "./pages/ForgotPassword";
+import { ResetPassword } from "./pages/ResetPassword";
 import userStore from "./stores/userStore";
 
 function App() {
@@ -23,6 +25,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
         <Route path="/" element={<Layout />}>
           <Route index element={<Homepage />} />
