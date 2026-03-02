@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Input } from "./Input";
 import { Button } from "./Button";
 
@@ -10,33 +10,39 @@ export const ForgotPasswordForm = () => {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError("");
-    setMessage("");
+ const handleSubmit = async (
+  e: React.FormEvent<HTMLFormElement>
+): Promise<void> => {
+  e.preventDefault();
 
-    try {
-      const response = await fetch(`${API_URL}/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+  setLoading(true);
+  setError("");
+  setMessage("");
 
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_URL}/forgot-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
 
-      console.log("data:: forgot pwd", data);
+    const data: { message?: string; detail?: string } = await response.json();
 
-      if (!response.ok) throw new Error(data.detail || "Something went wrong");
-
-      setMessage(data.message);
-      setEmail("");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      setError(data.detail ?? "Something went wrong");
+      return;
     }
-  };
+
+    setMessage(data.message ?? "Check your email for reset instructions.");
+    setEmail("");
+
+  } catch (error) {
+    console.error("Forgot password request failed:", error);
+    setError("Something went wrong. Please try again.");
+  }
+
+  setLoading(false);
+};
 
   return (
     <>

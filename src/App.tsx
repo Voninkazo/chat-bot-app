@@ -15,7 +15,6 @@ import userStore from "./stores/userStore";
 function App() {
    const { initializeAuth } = userStore(); // Access initializeAuth
 
-  // Call initializeAuth once when app loads
   useEffect(() => {
     initializeAuth().then();
   }, [initializeAuth]);

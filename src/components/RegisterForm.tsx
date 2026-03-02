@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {GoogleIcon} from "./GoogleIcon";
 import {Input} from "./Input";
@@ -27,45 +27,48 @@ export const RegisterForm = () => {
     setSuccessMessage("");
   };
 
-  const handleRegister = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setErrorMessage("");
+  const handleRegister = async (
+  e: React.FormEvent<HTMLFormElement>
+): Promise<void> => {
+  e.preventDefault();
 
-    try {
-      const response = await fetch(`${API_URL}/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Important for cookies
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password,
-          full_name: formData.fullName,
-        }),
-      });
+  setLoading(true);
+  setErrorMessage("");
+  setSuccessMessage("");
 
-      const data = await response.json();
-      console.log("data::", data);
+  try {
+    const response = await fetch(`${API_URL}/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+        full_name: formData.fullName,
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error(data.detail || "Registration failed");
-      }
+    const data: { detail?: string } = await response.json();
 
-      setSuccessMessage("Registration successful! Redirecting to login...");
-      setFormData({ email: "", password: "", fullName: "" });
-      
-      // Redirect to login after 2 seconds
-      setTimeout(() => {
-        navigate('/login');
-      }, 2000);
-    } catch (err) {
-      setErrorMessage(err.message);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      setErrorMessage(data.detail ?? "Registration failed");
+      return;
     }
-  };
+
+    setSuccessMessage("Registration successful! Redirecting to login...");
+    setFormData({ email: "", password: "", fullName: "" });
+
+    setTimeout(() => {
+      navigate("/login");
+    }, 2000);
+
+  } catch (error) {
+    console.error("Register failed:", error);
+    setErrorMessage("Something went wrong. Please try again.");
+  }
+
+  setLoading(false);
+};
 
 
   return (

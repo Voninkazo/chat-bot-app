@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Input } from "./Input";
 import { Button } from "./Button";
@@ -16,41 +16,52 @@ export const ResetPasswordForm = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (
+  e: React.FormEvent<HTMLFormElement>
+): Promise<void> => {
+  e.preventDefault();
 
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+  if (password !== confirmPassword) {
+    setError("Passwords do not match");
+    return;
+  }
+
+  if (password.length < 8) {
+    setError("Password must be at least 8 characters");
+    return;
+  }
+
+  setLoading(true);
+  setError("");
+  setSuccess("");
+
+  try {
+    const response = await fetch(`${API_URL}/reset-password`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token,
+        new_password: password,
+      }),
+    });
+
+    const data: { detail?: string } = await response.json();
+
+    if (!response.ok) {
+      setError(data.detail ?? "Reset failed");
       return;
     }
 
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
+    setSuccess("Password reset successfully! Redirecting...");
+    setTimeout(() => navigate("/login"), 2000);
 
-    setLoading(true);
-    setError("");
+  } catch (error) {
+    console.error("Reset failed:", error);
+    setError("Something went wrong. Please try again.");
+  }
 
-    try {
-      const response = await fetch(`${API_URL}/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, new_password: password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.detail || "Reset failed");
-
-      setSuccess("Password reset successfully! Redirecting to login...");
-      setTimeout(() => navigate("/login"), 2000);
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  setLoading(false);
+};
 
   if (!token) {
     return (

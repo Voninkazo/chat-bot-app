@@ -1,5 +1,5 @@
 import userStore from "../stores/userStore";
-import {useState} from "react";
+import React, {useState} from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {GoogleIcon} from "./GoogleIcon";
 import {Button} from "./Button";
@@ -7,6 +7,16 @@ import {Input} from "./Input";
 import {redirectToGoogleLogin} from "../utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
+
+interface User {
+  id: number;
+  email: string;
+  full_name: string;
+  is_admin: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 export const LoginForm = () => {
   const [loading, setLoading] = useState(false);
@@ -33,44 +43,52 @@ export const LoginForm = () => {
     setSuccess('');
   };
 
-   const handleUserLogin = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+   const handleUserLogin = async (
+  e: React.FormEvent<HTMLFormElement>
+): Promise<void> => {
+  e.preventDefault();
 
-    try {
-      const response = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Important! Allows cookies
-        body: JSON.stringify({
-          email: formData.email,
-          password: formData.password
-        })
-      });
+  setLoading(true);
+  setError("");
+  setSuccess("");
 
-      const data = await response.json();
+  try {
+    const response = await fetch(`${API_URL}/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        email: formData.email,
+        password: formData.password,
+      }),
+    });
 
-      if (!response.ok) {
-        throw new Error(data.detail || 'Login failed');
-      }
+    const data: {
+      user?: User;
+      detail?: string;
+    } = await response.json();
 
-      // Cookie is automatically set! Just update the store with user data
-      console.log('data::', data);
-      setUser(data.user);
-      setSuccess('Login successful!');
-      setFormData({ email: '', password: '', fullName: '' });
-      
-      // Redirect to the intended page or default to /chat
-      navigate(from, { replace: true });
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+    if (!response.ok) {
+      setError(data.detail ?? "Login failed");
+      return;
     }
-  };
+
+    if (data.user) {
+      setUser(data.user);
+    }
+
+    setSuccess("Login successful!");
+    setFormData({ email: "", password: "", fullName: "" });
+
+    navigate(from, { replace: true });
+
+  } catch (error) {
+    console.error("Login failed:", error);
+    setError("Something went wrong. Please try again.");
+  }
+
+  setLoading(false);
+};
 
   return (
       <>
