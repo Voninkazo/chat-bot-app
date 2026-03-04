@@ -371,12 +371,7 @@ const deleteSession = async (session_id: string): Promise<void> => {
             <div className="text-center text-gray-500 mt-8">
               <IconMusic className="w-16 h-16 mx-auto mb-4 text-blue-400" />
               <p className="text-lg mb-2">Welcome to Music Search Assistant!</p>
-              <p className="text-sm mb-4">Ask me to find songs in any language 🌍</p>
-              <div className="text-xs text-gray-400 space-y-1">
-                <p>Try: "Find me some happy songs"</p>
-                <p>Try: "Montre-moi des chansons rock" 🇫🇷</p>
-                <p>Try: "Canciones románticas" 🇪🇸</p>
-              </div>
+              <p className="text-sm mb-4">Ask me to find songs in any language</p>
             </div>
           ) : (
             messages.map((msg, idx) => (
@@ -417,7 +412,7 @@ const deleteSession = async (session_id: string): Promise<void> => {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask me to find songs... in any language! 🌍"
+            placeholder="Ask me to find songs... in any language!"
             disabled={isLoading || isLoadingHistory}
             className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
           />
