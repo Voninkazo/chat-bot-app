@@ -5,6 +5,26 @@ import { Button } from "./Button";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
+interface FormErrors {
+  password?: string;
+  confirmPassword?: string;
+}
+
+const validatePassword = (password: string): string => {
+  if (!password) return "Password is required.";
+  if (password.length < 8) return "Password must be at least 8 characters.";
+  if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter.";
+  if (!/[a-z]/.test(password)) return "Password must contain at least one lowercase letter.";
+  if (!/[0-9]/.test(password)) return "Password must contain at least one number.";
+  return "";
+};
+
+const validateConfirmPassword = (password: string, confirmPassword: string): string => {
+  if (!confirmPassword) return "Please confirm your password.";
+  if (password !== confirmPassword) return "Passwords do not match.";
+  return "";
+};
+
 export const ResetPasswordForm = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
@@ -12,56 +32,72 @@ export const ResetPasswordForm = () => {
 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
-const handleSubmit = async (
-  e: React.FormEvent<HTMLFormElement>
-): Promise<void> => {
-  e.preventDefault();
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setPassword(value);
+    setFormErrors((prev) => ({
+      ...prev,
+      password: validatePassword(value) || undefined,
+      // Re-validate confirm too if already touched
+      confirmPassword: confirmPassword
+        ? validateConfirmPassword(value, confirmPassword) || undefined
+        : prev.confirmPassword,
+    }));
+  };
 
-  if (password !== confirmPassword) {
-    setError("Passwords do not match");
-    return;
-  }
+  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setConfirmPassword(value);
+    setFormErrors((prev) => ({
+      ...prev,
+      confirmPassword: validateConfirmPassword(password, value) || undefined,
+    }));
+  };
 
-  if (password.length < 8) {
-    setError("Password must be at least 8 characters");
-    return;
-  }
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
 
-  setLoading(true);
-  setError("");
-  setSuccess("");
+    const errors: FormErrors = {
+      password: validatePassword(password) || undefined,
+      confirmPassword: validateConfirmPassword(password, confirmPassword) || undefined,
+    };
 
-  try {
-    const response = await fetch(`${API_URL}/reset-password`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        token,
-        new_password: password,
-      }),
-    });
-
-    const data: { detail?: string } = await response.json();
-
-    if (!response.ok) {
-      setError(data.detail ?? "Reset failed");
+    if (errors.password || errors.confirmPassword) {
+      setFormErrors(errors);
       return;
     }
 
-    setSuccess("Password reset successfully! Redirecting...");
-    setTimeout(() => navigate("/login"), 2000);
+    setLoading(true);
+    try {
+      const response = await fetch(`${API_URL}/reset-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, new_password: password }),
+      });
 
-  } catch (error) {
-    console.error("Reset failed:", error);
-    setError("Something went wrong. Please try again.");
-  }
+      const data: { detail?: string } = await response.json();
 
-  setLoading(false);
-};
+      if (!response.ok) {
+        setError(data.detail ?? "Reset failed");
+        return;
+      }
+
+      setSuccess("Password reset successfully! Redirecting...");
+      setTimeout(() => navigate("/login"), 2000);
+    } catch (err) {
+      console.error("Reset failed:", err);
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!token) {
     return (
@@ -93,10 +129,14 @@ const handleSubmit = async (
           <Input
             type="password"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={handlePasswordChange}
             required
             placeholder="••••••••"
+            className={formErrors.password ? "border-red-400" : ""}
           />
+          {formErrors.password && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.password}</p>
+          )}
         </div>
 
         <div>
@@ -106,10 +146,14 @@ const handleSubmit = async (
           <Input
             type="password"
             value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
+            onChange={handleConfirmPasswordChange}
             required
             placeholder="••••••••"
+            className={formErrors.confirmPassword ? "border-red-400" : ""}
           />
+          {formErrors.confirmPassword && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.confirmPassword}</p>
+          )}
         </div>
 
         <Button type="submit" disabled={loading} className="w-full">
