@@ -1,8 +1,28 @@
-import { create } from 'zustand';
+import { create } from "zustand";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-const userStore = create((set, get) => ({
+export interface User {
+  id: number;
+  email: string;
+  full_name: string;
+  is_admin: boolean;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+interface UserStore {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  setUser: (user: User) => void;
+  logout: () => Promise<void>;
+  initializeAuth: () => Promise<void>;
+  handleOAuthCallback: () => Promise<boolean>;
+}
+
+const userStore = create<UserStore>((set, get) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
@@ -12,54 +32,40 @@ const userStore = create((set, get) => ({
   logout: async () => {
     try {
       await fetch(`${API_URL}/logout`, {
-        method: 'POST',
-        credentials: 'include' // Important! Sends cookies
+        method: "POST",
+        credentials: "include",
       });
       set({ user: null, isAuthenticated: false, isLoading: false });
     } catch (error) {
-      console.error('Logout error:', error);
+      console.error("Logout error:", error);
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 
   initializeAuth: async () => {
     set({ isLoading: true });
-
     try {
       const response = await fetch(`${API_URL}/users/me`, {
-        credentials: 'include' // Important! Sends cookies
+        credentials: "include",
       });
-
-      if (!response.ok) {
-        throw new Error('Not authenticated');
-      }
-
-      const userData = await response.json();
+      if (!response.ok) throw new Error("Not authenticated");
+      const userData: User = await response.json();
       set({ user: userData, isAuthenticated: true, isLoading: false });
     } catch {
       set({ user: null, isAuthenticated: false, isLoading: false });
     }
   },
 
-  // Handle OAuth callback - check if we're returning from Google OAuth
   handleOAuthCallback: async () => {
-    const isOAuthCallback = window.location.pathname === '/auth/callback';
-
+    const isOAuthCallback = window.location.pathname === "/auth/callback";
     if (isOAuthCallback) {
-      // We're returning from Google OAuth
-      // Cookie is already set by backend, just fetch user data
       set({ isLoading: true });
-
-      // Clean up URL
-      window.history.replaceState({}, document.title, '/');
-
-      // Fetch user profile (cookie will be sent automatically)
+      window.history.replaceState({}, document.title, "/");
       await get().initializeAuth();
       return true;
     }
-
     return false;
-  }
+  },
 }));
 
 export default userStore;
