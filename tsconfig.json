@@ -25,6 +25,6 @@
     "forceConsistentCasingInFileNames": true // case-sensitive imports
   },
 
-  "include": ["vite.config.ts", "scripts"],
+  "include": ["src", "vite.config.ts", "scripts"],
   "exclude": ["node_modules", "dist"] // always ignore build output
 }
