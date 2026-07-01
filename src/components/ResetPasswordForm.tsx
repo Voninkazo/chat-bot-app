@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Input } from "./Input";
 import { Button } from "./Button";
+import { PasswordInput } from "./PasswordInput";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,13 +13,19 @@ interface FormErrors {
 const validatePassword = (password: string): string => {
   if (!password) return "Password is required.";
   if (password.length < 8) return "Password must be at least 8 characters.";
-  if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter.";
-  if (!/[a-z]/.test(password)) return "Password must contain at least one lowercase letter.";
-  if (!/[0-9]/.test(password)) return "Password must contain at least one number.";
+  if (!/[A-Z]/.test(password))
+    return "Password must contain at least one uppercase letter.";
+  if (!/[a-z]/.test(password))
+    return "Password must contain at least one lowercase letter.";
+  if (!/[0-9]/.test(password))
+    return "Password must contain at least one number.";
   return "";
 };
 
-const validateConfirmPassword = (password: string, confirmPassword: string): string => {
+const validateConfirmPassword = (
+  password: string,
+  confirmPassword: string,
+): string => {
   if (!confirmPassword) return "Please confirm your password.";
   if (password !== confirmPassword) return "Passwords do not match.";
   return "";
@@ -50,7 +56,9 @@ export const ResetPasswordForm = () => {
     }));
   };
 
-  const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleConfirmPasswordChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
     const value = e.target.value;
     setConfirmPassword(value);
     setFormErrors((prev) => ({
@@ -59,14 +67,17 @@ export const ResetPasswordForm = () => {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
     const errors: FormErrors = {
       password: validatePassword(password) || undefined,
-      confirmPassword: validateConfirmPassword(password, confirmPassword) || undefined,
+      confirmPassword:
+        validateConfirmPassword(password, confirmPassword) || undefined,
     };
 
     if (errors.password || errors.confirmPassword) {
@@ -126,8 +137,7 @@ export const ResetPasswordForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             New Password
           </label>
-          <Input
-            type="password"
+          <PasswordInput
             value={password}
             onChange={handlePasswordChange}
             required
@@ -143,8 +153,7 @@ export const ResetPasswordForm = () => {
           <label className="block text-sm font-medium text-gray-700 mb-2">
             Confirm New Password
           </label>
-          <Input
-            type="password"
+          <PasswordInput
             value={confirmPassword}
             onChange={handleConfirmPasswordChange}
             required
@@ -152,7 +161,9 @@ export const ResetPasswordForm = () => {
             className={formErrors.confirmPassword ? "border-red-400" : ""}
           />
           {formErrors.confirmPassword && (
-            <p className="text-red-500 text-xs mt-1">{formErrors.confirmPassword}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {formErrors.confirmPassword}
+            </p>
           )}
         </div>
 

@@ -1,22 +1,13 @@
-import userStore from "../stores/userStore";
+import userStore, { User } from "../stores/userStore";
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { GoogleIcon } from "./GoogleIcon";
 import { Button } from "./Button";
 import { Input } from "./Input";
+import { PasswordInput } from "./PasswordInput";
 import { redirectToGoogleLogin } from "../utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
-
-interface User {
-  id: number;
-  email: string;
-  full_name: string;
-  is_admin: boolean;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
-}
 
 interface FormErrors {
   email?: string;
@@ -35,7 +26,10 @@ const validatePassword = (password: string): string => {
   return "";
 };
 
-const validate = (formData: { email: string; password: string }): FormErrors => {
+const validate = (formData: {
+  email: string;
+  password: string;
+}): FormErrors => {
   return {
     email: validateEmail(formData.email) || undefined,
     password: validatePassword(formData.password) || undefined,
@@ -44,7 +38,11 @@ const validate = (formData: { email: string; password: string }): FormErrors => 
 
 export const LoginForm = () => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "", fullName: "" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    fullName: "",
+  });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -61,11 +59,21 @@ export const LoginForm = () => {
     setSuccess("");
 
     // Clear field-level error on change
-    if (name === "email") setFormErrors((prev) => ({ ...prev, email: validateEmail(value) || undefined }));
-    if (name === "password") setFormErrors((prev) => ({ ...prev, password: validatePassword(value) || undefined }));
+    if (name === "email")
+      setFormErrors((prev) => ({
+        ...prev,
+        email: validateEmail(value) || undefined,
+      }));
+    if (name === "password")
+      setFormErrors((prev) => ({
+        ...prev,
+        password: validatePassword(value) || undefined,
+      }));
   };
 
-  const handleUserLogin = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleUserLogin = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     setError("");
     setSuccess("");
@@ -82,7 +90,10 @@ export const LoginForm = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ email: formData.email, password: formData.password }),
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+        }),
       });
 
       const data: { user?: User; detail?: string } = await response.json();
@@ -121,7 +132,9 @@ export const LoginForm = () => {
 
       <form onSubmit={handleUserLogin} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
           <Input
             type="email"
             name="email"
@@ -137,9 +150,10 @@ export const LoginForm = () => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-          <Input
-            type="password"
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <PasswordInput
             name="password"
             value={formData.password}
             onChange={handleInputChange}
@@ -153,7 +167,10 @@ export const LoginForm = () => {
         </div>
 
         <div className="text-right mt-1">
-          <a href="/forgot-password" className="text-sm text-blue-600 hover:underline">
+          <a
+            href="/forgot-password"
+            className="text-sm text-blue-600 hover:underline"
+          >
             Forgot password?
           </a>
         </div>

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GoogleIcon } from "./GoogleIcon";
 import { Input } from "./Input";
 import { Button } from "./Button";
+import { PasswordInput } from "./PasswordInput";
 import { redirectToGoogleLogin } from "../utils";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -23,20 +24,29 @@ const validateEmail = (email: string): string => {
 const validatePassword = (password: string): string => {
   if (!password) return "Password is required.";
   if (password.length < 8) return "Password must be at least 8 characters.";
-  if (!/[A-Z]/.test(password)) return "Password must contain at least one uppercase letter.";
-  if (!/[a-z]/.test(password)) return "Password must contain at least one lowercase letter.";
-  if (!/[0-9]/.test(password)) return "Password must contain at least one number.";
+  if (!/[A-Z]/.test(password))
+    return "Password must contain at least one uppercase letter.";
+  if (!/[a-z]/.test(password))
+    return "Password must contain at least one lowercase letter.";
+  if (!/[0-9]/.test(password))
+    return "Password must contain at least one number.";
   return "";
 };
 
 const validateFullName = (fullName: string): string => {
   if (!fullName.trim()) return "Full name is required.";
-  if (fullName.trim().length < 2) return "Full name must be at least 2 characters.";
-  if (!/^[a-zA-Z\s'-]+$/.test(fullName)) return "Full name contains invalid characters.";
+  if (fullName.trim().length < 2)
+    return "Full name must be at least 2 characters.";
+  if (!/^[a-zA-Z\s'-]+$/.test(fullName))
+    return "Full name contains invalid characters.";
   return "";
 };
 
-const validate = (formData: { email: string; password: string; fullName: string }): FormErrors => {
+const validate = (formData: {
+  email: string;
+  password: string;
+  fullName: string;
+}): FormErrors => {
   return {
     email: validateEmail(formData.email) || undefined,
     password: validatePassword(formData.password) || undefined,
@@ -46,7 +56,11 @@ const validate = (formData: { email: string; password: string; fullName: string 
 
 export const RegisterForm = () => {
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ email: "", password: "", fullName: "" });
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+    fullName: "",
+  });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
@@ -67,11 +81,16 @@ export const RegisterForm = () => {
     // Real-time per-field validation
     const validator = validators[name];
     if (validator) {
-      setFormErrors((prev) => ({ ...prev, [name]: validator(value) || undefined }));
+      setFormErrors((prev) => ({
+        ...prev,
+        [name]: validator(value) || undefined,
+      }));
     }
   };
 
-  const handleRegister = async (e: React.FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleRegister = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ): Promise<void> => {
     e.preventDefault();
     setErrorMessage("");
     setSuccessMessage("");
@@ -129,7 +148,9 @@ export const RegisterForm = () => {
 
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Email
+          </label>
           <Input
             type="email"
             name="email"
@@ -139,13 +160,16 @@ export const RegisterForm = () => {
             placeholder="you@example.com"
             className={formErrors.email ? "border-red-400" : ""}
           />
-          {formErrors.email && <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>}
+          {formErrors.email && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.email}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
-          <Input
-            type="password"
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Password
+          </label>
+          <PasswordInput
             name="password"
             value={formData.password}
             onChange={handleChange}
@@ -153,11 +177,15 @@ export const RegisterForm = () => {
             placeholder="••••••••"
             className={formErrors.password ? "border-red-400" : ""}
           />
-          {formErrors.password && <p className="text-red-500 text-xs mt-1">{formErrors.password}</p>}
+          {formErrors.password && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.password}</p>
+          )}
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Full Name
+          </label>
           <Input
             type="text"
             name="fullName"
@@ -166,7 +194,9 @@ export const RegisterForm = () => {
             required
             className={formErrors.fullName ? "border-red-400" : ""}
           />
-          {formErrors.fullName && <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>}
+          {formErrors.fullName && (
+            <p className="text-red-500 text-xs mt-1">{formErrors.fullName}</p>
+          )}
         </div>
 
         <Button type="submit" disabled={loading} className="w-full">
