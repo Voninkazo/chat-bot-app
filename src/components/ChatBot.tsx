@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { IconMusic, IconSettings, IconX, IconTrash } from "@tabler/icons-react";
+import { MarkdownMessage } from "./MarkdownMessage";
 
 interface MessageProps {
   id?: string | number;
@@ -381,7 +382,13 @@ const deleteSession = async (session_id: string): Promise<void> => {
                     ? "bg-blue-600 text-white rounded-br-sm"
                     : "bg-white text-gray-800 border border-gray-200 shadow-sm rounded-bl-sm"
                 }`}>
-                  <div className="prose prose-sm max-w-none whitespace-pre-wrap">{msg.content}</div>
+                  {msg.role === "assistant" ? (
+                    // Render AI responses as markdown (supports code, lists, headings, etc.)
+                    <MarkdownMessage content={msg.content} />
+                  ) : (
+                    // User messages are plain text — preserve line breaks
+                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                  )}
                 </div>
               </div>
             ))

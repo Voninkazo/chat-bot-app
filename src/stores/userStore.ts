@@ -8,6 +8,7 @@ export interface User {
   full_name: string;
   is_admin: boolean;
   is_active: boolean;
+  oauth_provider?: string;
   created_at: string;
   updated_at: string;
 }

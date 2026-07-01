@@ -1,14 +1,13 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { LoginForm } from '../components/LoginForm';
 import { useNavigate } from 'react-router-dom';
 import userStore from '../stores/userStore';
-import {Button} from "../components/Button";
 
 export const Login = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = userStore();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
       navigate('/chat');
     }
