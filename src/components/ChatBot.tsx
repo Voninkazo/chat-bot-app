@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import { IconMusic, IconSettings, IconX, IconTrash } from "@tabler/icons-react";
+import { toast } from "sonner";
 import { MarkdownMessage } from "./MarkdownMessage";
 
 interface MessageProps {
@@ -113,7 +114,7 @@ export const ChatBot = () => {
       );
 
       if (!response.ok) {
-        console.error("Failed to delete session:", response.status);
+        toast.error("Failed to delete conversation. Please try again.");
         return;
       }
 
@@ -125,6 +126,7 @@ export const ChatBot = () => {
       await loadChatHistory();
     } catch (error) {
       console.error("Error deleting session:", error);
+      toast.error("Something went wrong while deleting. Please try again.");
     }
 
     setIsDeleting(false);
@@ -141,7 +143,7 @@ export const ChatBot = () => {
       });
 
       if (!response.ok) {
-        console.error("Failed to delete all sessions:", response.status);
+        toast.error("Failed to clear history. Please try again.");
         return;
       }
 
@@ -151,6 +153,7 @@ export const ChatBot = () => {
       setShowSessions(false);
     } catch (error) {
       console.error("Error deleting all sessions:", error);
+      toast.error("Something went wrong while clearing history. Please try again.");
     }
 
     setIsDeleting(false);
@@ -184,6 +187,7 @@ export const ChatBot = () => {
 
       if (!response.ok) {
         console.error("Chat API error:", response.status);
+        toast.error("Failed to send message. Please try again.");
         return;
       }
 
@@ -196,6 +200,7 @@ export const ChatBot = () => {
 
       if (!data.success) {
         console.error("API logical error:", data.error);
+        toast.error(data.error ?? "Something went wrong. Please try again.");
         return;
       }
 
