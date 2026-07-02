@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { toast } from "sonner";
 import { Button } from "./Button";
 import { PasswordInput } from "./PasswordInput";
 
@@ -40,8 +41,6 @@ export const ResetPasswordForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
@@ -71,8 +70,6 @@ export const ResetPasswordForm = () => {
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     const errors: FormErrors = {
       password: validatePassword(password) || undefined,
@@ -96,15 +93,15 @@ export const ResetPasswordForm = () => {
       const data: { detail?: string } = await response.json();
 
       if (!response.ok) {
-        setError(data.detail ?? "Reset failed");
+        toast.error(data.detail ?? "Reset failed");
         return;
       }
 
-      setSuccess("Password reset successfully! Redirecting...");
+      toast.success("Password reset successfully! Redirecting to login...");
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       console.error("Reset failed:", err);
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -120,18 +117,6 @@ export const ResetPasswordForm = () => {
 
   return (
     <>
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-          {success}
-        </div>
-      )}
-
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

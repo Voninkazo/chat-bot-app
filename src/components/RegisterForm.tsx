@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import { GoogleIcon } from "./GoogleIcon";
 import { Input } from "./Input";
 import { Button } from "./Button";
@@ -62,8 +63,6 @@ export const RegisterForm = () => {
     fullName: "",
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
   const navigate = useNavigate();
 
   const validators: Record<string, (v: string) => string> = {
@@ -75,8 +74,6 @@ export const RegisterForm = () => {
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setErrorMessage("");
-    setSuccessMessage("");
 
     // Real-time per-field validation
     const validator = validators[name];
@@ -92,8 +89,6 @@ export const RegisterForm = () => {
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
-    setErrorMessage("");
-    setSuccessMessage("");
 
     const errors = validate(formData);
     if (errors.email || errors.password || errors.fullName) {
@@ -117,16 +112,16 @@ export const RegisterForm = () => {
       const data: { detail?: string } = await response.json();
 
       if (!response.ok) {
-        setErrorMessage(data.detail ?? "Registration failed");
+        toast.error(data.detail ?? "Registration failed");
         return;
       }
 
-      setSuccessMessage("Registration successful! Redirecting to login...");
+      toast.success("Registration successful! Redirecting to login...");
       setFormData({ email: "", password: "", fullName: "" });
       setTimeout(() => navigate("/login"), 2000);
     } catch (err) {
       console.error("Register failed:", err);
-      setErrorMessage("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -134,18 +129,6 @@ export const RegisterForm = () => {
 
   return (
     <>
-      {errorMessage && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-          {errorMessage}
-        </div>
-      )}
-
-      {successMessage && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-          {successMessage}
-        </div>
-      )}
-
       <form onSubmit={handleRegister} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">

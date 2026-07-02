@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Toaster } from "sonner";
 import "./App.css";
 import { Homepage } from "./pages/Homepage";
 import { Chat } from "./pages/Chat";
@@ -21,6 +22,7 @@ function App() {
 
   return (
     <Router>
+      <Toaster position="top-right" richColors />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

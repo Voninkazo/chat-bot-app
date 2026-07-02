@@ -1,6 +1,7 @@
 import userStore, { User } from "../stores/userStore";
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { toast } from "sonner";
 import { GoogleIcon } from "./GoogleIcon";
 import { Button } from "./Button";
 import { Input } from "./Input";
@@ -44,8 +45,6 @@ export const LoginForm = () => {
     fullName: "",
   });
   const [formErrors, setFormErrors] = useState<FormErrors>({});
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
 
   const { setUser } = userStore();
   const navigate = useNavigate();
@@ -55,8 +54,6 @@ export const LoginForm = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
-    setError("");
-    setSuccess("");
 
     // Clear field-level error on change
     if (name === "email")
@@ -75,8 +72,6 @@ export const LoginForm = () => {
     e: React.FormEvent<HTMLFormElement>,
   ): Promise<void> => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     const errors = validate(formData);
     if (errors.email || errors.password) {
@@ -99,18 +94,18 @@ export const LoginForm = () => {
       const data: { user?: User; detail?: string } = await response.json();
 
       if (!response.ok) {
-        setError(data.detail ?? "Login failed");
+        toast.error(data.detail ?? "Login failed");
         return;
       }
 
       if (data.user) setUser(data.user);
 
-      setSuccess("Login successful!");
+      toast.success("Login successful!");
       setFormData({ email: "", password: "", fullName: "" });
       navigate(from, { replace: true });
     } catch (err) {
       console.error("Login failed:", err);
-      setError("Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -118,18 +113,6 @@ export const LoginForm = () => {
 
   return (
     <>
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-4">
-          {error}
-        </div>
-      )}
-
-      {success && (
-        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg mb-4">
-          {success}
-        </div>
-      )}
-
       <form onSubmit={handleUserLogin} className="space-y-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
