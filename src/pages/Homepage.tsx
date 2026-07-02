@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import userStore from '../stores/userStore';
 
@@ -6,7 +6,7 @@ export const Homepage = () => {
   const navigate = useNavigate();
   const { isAuthenticated } = userStore();
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (isAuthenticated) {
       navigate('/chat');
     }

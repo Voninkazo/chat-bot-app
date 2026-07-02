@@ -1,5 +1,13 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
-import { IconMusic, IconSettings, IconX, IconTrash } from "@tabler/icons-react";
+import {
+  IconMusic,
+  IconSettings,
+  IconX,
+  IconTrash,
+  IconCopy,
+  IconCheck,
+  IconRobot,
+} from "@tabler/icons-react";
 import { toast } from "sonner";
 import { MarkdownMessage } from "./MarkdownMessage";
 
@@ -19,6 +27,36 @@ interface Session {
 
 const API_URL = import.meta.env.VITE_API_URL;
 const MAX_TEXTAREA_HEIGHT = 200;
+
+const CopyButton = ({ text }: { text: string }) => {
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(text);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <button
+      onClick={handleCopy}
+      className="flex items-center gap-1 px-2 py-1 text-xs text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+      title="Copy message"
+    >
+      {copied ? (
+        <>
+          <IconCheck size={13} className="text-green-500" />
+          <span className="text-green-500">Copied</span>
+        </>
+      ) : (
+        <>
+          <IconCopy size={13} />
+          <span>Copy</span>
+        </>
+      )}
+    </button>
+  );
+};
 
 export const ChatBot = () => {
   const [messages, setMessages] = useState<MessageProps[]>([]);
@@ -168,6 +206,7 @@ export const ChatBot = () => {
     if (!trimmedInput || isLoading) return;
 
     const userMessage: MessageProps = {
+      id: crypto.randomUUID(),
       role: "user",
       content: trimmedInput,
     };
@@ -213,6 +252,7 @@ export const ChatBot = () => {
       setMessages((prev) => [
         ...prev,
         {
+          id: crypto.randomUUID(),
           role: "assistant",
           content: data.response ?? "",
         },
@@ -225,6 +265,7 @@ export const ChatBot = () => {
       setMessages((prev) => [
         ...prev,
         {
+          id: crypto.randomUUID(),
           role: "assistant",
           content: "Sorry, something went wrong.",
         },
@@ -415,26 +456,35 @@ export const ChatBot = () => {
               </p>
             </div>
           ) : (
-            messages.map((msg, idx) => (
+            messages.map((msg) => (
               <div
-                key={idx}
+                key={msg.id}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
-                <div
-                  className={`max-w-2xl px-4 py-3 rounded-2xl ${
-                    msg.role === "user"
-                      ? "bg-blue-600 text-white rounded-br-sm"
-                      : "bg-white text-gray-800 border border-gray-200 shadow-sm rounded-bl-sm"
-                  }`}
-                >
-                  {msg.role === "assistant" ? (
-                    // Render AI responses as markdown (supports code, lists, headings, etc.)
-                    <MarkdownMessage content={msg.content} />
-                  ) : (
-                    // User messages are plain text — preserve line breaks
+                {msg.role === "assistant" ? (
+                  <div className="flex flex-col gap-1 max-w-2xl">
+                    {/* Assistant label */}
+                    <div className="flex items-center gap-1.5 px-1">
+                      <IconRobot size={14} className="text-blue-500" />
+                      <span className="text-xs font-medium text-gray-400">
+                        Assistant
+                      </span>
+                    </div>
+                    {/* Message bubble */}
+                    <div className="bg-white text-gray-800 border border-gray-200 shadow-sm px-4 py-3 rounded-2xl rounded-tl-sm">
+                      <MarkdownMessage content={msg.content} />
+                    </div>
+                    {/* Actions row */}
+                    <div className="flex items-center pl-1">
+                      <CopyButton text={msg.content} />
+                    </div>
+                  </div>
+                ) : (
+                  // User message
+                  <div className="max-w-2xl px-4 py-3 bg-blue-600 text-white rounded-2xl rounded-br-sm">
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  )}
-                </div>
+                  </div>
+                )}
               </div>
             ))
           )}
