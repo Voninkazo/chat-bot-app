@@ -8,13 +8,14 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { Layout } from "./components/Layout";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import {Admin} from "./pages/Admin";
+import { Admin } from "./pages/Admin";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
+import { NotFound } from "./pages/NotFound";
 import userStore from "./stores/userStore";
 
 function App() {
-   const { initializeAuth } = userStore(); // Access initializeAuth
+  const { initializeAuth } = userStore(); // Access initializeAuth
 
   useEffect(() => {
     initializeAuth().then();
@@ -31,23 +32,25 @@ function App() {
 
         <Route path="/" element={<Layout />}>
           <Route index element={<Homepage />} />
-          <Route 
-            path="/chat" 
+          <Route
+            path="/chat"
             element={
               <ProtectedRoute>
                 <Chat />
               </ProtectedRoute>
-            } 
+            }
           />
-          <Route 
-            path="/admin" 
+          <Route
+            path="/admin"
             element={
               <ProtectedRoute>
                 <Admin />
               </ProtectedRoute>
-            } 
+            }
           />
         </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
