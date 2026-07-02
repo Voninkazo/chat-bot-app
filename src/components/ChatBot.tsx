@@ -127,10 +127,10 @@ export const ChatBot = () => {
     } catch (error) {
       console.error("Error deleting session:", error);
       toast.error("Something went wrong while deleting. Please try again.");
+    } finally {
+      setIsDeleting(false);
+      setConfirmDeleteId(null);
     }
-
-    setIsDeleting(false);
-    setConfirmDeleteId(null);
   };
 
   const deleteAllSessions = async (): Promise<void> => {
@@ -153,11 +153,13 @@ export const ChatBot = () => {
       setShowSessions(false);
     } catch (error) {
       console.error("Error deleting all sessions:", error);
-      toast.error("Something went wrong while clearing history. Please try again.");
+      toast.error(
+        "Something went wrong while clearing history. Please try again.",
+      );
+    } finally {
+      setIsDeleting(false);
+      setConfirmDeleteAll(false);
     }
-
-    setIsDeleting(false);
-    setConfirmDeleteAll(false);
   };
 
   const sendMessage = async (): Promise<void> => {
@@ -227,9 +229,9 @@ export const ChatBot = () => {
           content: "Sorry, something went wrong.",
         },
       ]);
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleKeyDown = async (e: React.KeyboardEvent) => {
