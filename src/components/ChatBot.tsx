@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect, useLayoutEffect } from "react";
 import {
-  IconMusic,
   IconSettings,
   IconX,
   IconTrash,
@@ -309,10 +308,8 @@ export const ChatBot = () => {
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
-          <IconMusic className="w-6 h-6 text-blue-600" />
-          <h1 className="text-xl font-semibold text-gray-800">
-            Music Search Assistant
-          </h1>
+          <IconRobot className="w-6 h-6 text-blue-600" />
+          <h1 className="text-xl font-semibold text-gray-800">AI Assistant</h1>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -461,110 +458,133 @@ export const ChatBot = () => {
         </div>
       )}
 
-      {/* Messages */}
-      <div
-        ref={scrollContainerRef}
-        className="overflow-y-auto px-4 py-6 flex-1"
-      >
-        <div className="max-w-3xl mx-auto space-y-4">
-          {isLoadingHistory ? (
-            <div className="text-center text-gray-400 mt-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3" />
-              <p className="text-sm">Loading your conversations...</p>
-            </div>
-          ) : messages.length === 0 ? (
-            <div className="text-center text-gray-500 mt-8">
-              <IconMusic className="w-16 h-16 mx-auto mb-4 text-blue-400" />
-              <p className="text-lg mb-2">Welcome to Music Search Assistant!</p>
-              <p className="text-sm mb-4">
-                Ask me to find songs in any language
-              </p>
-            </div>
-          ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                {msg.role === "assistant" ? (
-                  <div className="flex flex-col gap-1 max-w-2xl">
-                    {/* Assistant label */}
-                    <div className="flex items-center gap-1.5 px-1">
-                      <IconRobot size={14} className="text-blue-500" />
-                      <span className="text-xs font-medium text-gray-400">
-                        Assistant
-                      </span>
-                    </div>
-                    {/* Message bubble */}
-                    <div className="bg-white text-gray-800 border border-gray-200 shadow-sm px-4 py-3 rounded-2xl rounded-tl-sm">
-                      <MarkdownMessage content={msg.content} />
-                    </div>
-                    {/* Actions row */}
-                    <div className="flex items-center pl-1">
-                      <CopyButton text={msg.content} />
-                    </div>
-                  </div>
-                ) : (
-                  // User message
-                  <div className="max-w-2xl px-4 py-3 bg-blue-600 text-white rounded-2xl rounded-br-sm">
-                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                  </div>
-                )}
-              </div>
-            ))
-          )}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-white border border-gray-200 shadow-sm px-4 py-3 rounded-2xl rounded-bl-sm">
-                <div className="flex items-center gap-2 text-gray-500">
-                  <div className="flex gap-1">
-                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:0ms]" />
-                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:150ms]" />
-                    <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:300ms]" />
-                  </div>
-                  <span className="text-sm">Thinking...</span>
-                </div>
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
+      {!isLoadingHistory && messages.length === 0 ? (
+        /* ── Empty state: input centered in the viewport ── */
+        <div className="flex-1 flex flex-col items-center justify-center px-4 pb-12">
+          <IconRobot className="w-16 h-16 mb-4 text-blue-400" />
+          <p className="text-xl font-semibold text-gray-700 mb-2">
+            How can I help you today?
+          </p>
+          <p className="text-sm text-gray-400 mb-8">
+            Ask me anything — coding, science, language, music, and more.
+          </p>
+          <div className="w-full max-w-2xl flex items-end gap-2">
+            <textarea
+              ref={textareaRef}
+              rows={1}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Ask anything... (Shift+Enter for new line)"
+              disabled={isLoading}
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none leading-relaxed shadow-sm"
+            />
+            <button
+              onClick={sendMessage}
+              disabled={isLoading || !input.trim()}
+              className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+            >
+              Send
+            </button>
+          </div>
         </div>
-      </div>
-
-      {/* Scroll to bottom button — floats above the input when user scrolls up */}
-      {!isAtBottom && messages.length > 0 && (
-        <button
-          onClick={scrollToBottom}
-          className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 shadow-md text-sm text-gray-600 rounded-full hover:bg-gray-50 transition-all"
-        >
-          <IconArrowDown size={15} />
-          <span>Scroll to latest message</span>
-        </button>
-      )}
-
-      {/* Input */}
-      <div className="border-t border-gray-200 bg-white px-4 py-4">
-        {/* items-end keeps the Send button pinned to the bottom as the textarea grows */}
-        <div className="max-w-3xl mx-auto flex items-end gap-2">
-          <textarea
-            ref={textareaRef}
-            rows={1}
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Ask anything... (Shift+Enter for new line)"
-            disabled={isLoading || isLoadingHistory}
-            className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none leading-relaxed"
-          />
-          <button
-            onClick={sendMessage}
-            disabled={isLoading || isLoadingHistory || !input.trim()}
-            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+      ) : (
+        /* ── Active conversation: messages scroll, input pinned to bottom ── */
+        <>
+          <div
+            ref={scrollContainerRef}
+            className="overflow-y-auto px-4 py-6 flex-1"
           >
-            Send
-          </button>
-        </div>
-      </div>
+            <div className="max-w-3xl mx-auto space-y-4">
+              {isLoadingHistory ? (
+                <div className="text-center text-gray-400 mt-16">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-3" />
+                  <p className="text-sm">Loading your conversations...</p>
+                </div>
+              ) : (
+                messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    {msg.role === "assistant" ? (
+                      <div className="flex flex-col gap-1 max-w-2xl">
+                        <div className="flex items-center gap-1.5 px-1">
+                          <IconRobot size={14} className="text-blue-500" />
+                          <span className="text-xs font-medium text-gray-400">
+                            Assistant
+                          </span>
+                        </div>
+                        <div className="bg-white text-gray-800 border border-gray-200 shadow-sm px-4 py-3 rounded-2xl rounded-tl-sm">
+                          <MarkdownMessage content={msg.content} />
+                        </div>
+                        <div className="flex items-center pl-1">
+                          <CopyButton text={msg.content} />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="max-w-2xl px-4 py-3 bg-blue-600 text-white rounded-2xl rounded-br-sm">
+                        <p className="text-sm whitespace-pre-wrap">
+                          {msg.content}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ))
+              )}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-white border border-gray-200 shadow-sm px-4 py-3 rounded-2xl rounded-bl-sm">
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <div className="flex gap-1">
+                        <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:0ms]" />
+                        <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:150ms]" />
+                        <span className="w-2 h-2 bg-blue-400 rounded-full animate-bounce [animation-delay:300ms]" />
+                      </div>
+                      <span className="text-sm">Thinking...</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div ref={messagesEndRef} />
+            </div>
+          </div>
+
+          {/* Scroll to bottom button */}
+          {!isAtBottom && (
+            <button
+              onClick={scrollToBottom}
+              className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 shadow-md text-sm text-gray-600 rounded-full hover:bg-gray-50 transition-all"
+            >
+              <IconArrowDown size={15} />
+              <span>Scroll to latest</span>
+            </button>
+          )}
+
+          {/* Input pinned to bottom */}
+          <div className="border-t border-gray-200 bg-white px-4 py-4">
+            <div className="max-w-3xl mx-auto flex items-end gap-2">
+              <textarea
+                ref={textareaRef}
+                rows={1}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Ask anything... (Shift+Enter for new line)"
+                disabled={isLoading}
+                className="flex-1 px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed resize-none leading-relaxed"
+              />
+              <button
+                onClick={sendMessage}
+                disabled={isLoading || !input.trim()}
+                className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed font-medium"
+              >
+                Send
+              </button>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 };
