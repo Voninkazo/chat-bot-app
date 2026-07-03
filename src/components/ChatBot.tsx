@@ -7,6 +7,7 @@ import {
   IconCopy,
   IconCheck,
   IconRobot,
+  IconArrowDown,
 } from "@tabler/icons-react";
 import { toast } from "sonner";
 import { MarkdownMessage } from "./MarkdownMessage";
@@ -73,26 +74,47 @@ export const ChatBot = () => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const messagesEndRef = useRef<null | HTMLDivElement>(null);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
   useEffect(() => {
     loadChatHistory().then();
   }, []);
 
   useEffect(() => {
+    if (isAtBottom) {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, isAtBottom]);
+
+  // Track whether the user has scrolled away from the bottom
+  useEffect(() => {
+    const element = scrollContainerRef.current;
+    if (!element) return;
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = element;
+      setIsAtBottom(scrollHeight - scrollTop - clientHeight < 80);
+    };
+    element.addEventListener("scroll", handleScroll);
+    return () => element.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+    setIsAtBottom(true);
+  };
 
   // Grow the textarea as the user types, up to a max of 200px.
   // Reset to one line when input is cleared (after send).
   useLayoutEffect(() => {
-    const el = textareaRef.current;
-    if (!el) return;
-    el.style.height = "auto";
-    const next = Math.min(el.scrollHeight, MAX_TEXTAREA_HEIGHT);
-    el.style.height = `${next}px`;
-    el.style.overflowY =
-      el.scrollHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
+    const element = textareaRef.current;
+    if (!element) return;
+    element.style.height = "auto";
+    const next = Math.min(element.scrollHeight, MAX_TEXTAREA_HEIGHT);
+    element.style.height = `${next}px`;
+    element.style.overflowY =
+      element.scrollHeight > MAX_TEXTAREA_HEIGHT ? "auto" : "hidden";
   }, [input]);
 
   const loadChatHistory = async (): Promise<void> => {
@@ -283,7 +305,7 @@ export const ChatBot = () => {
   };
 
   return (
-    <div className="flex max-h-screen flex-col bg-gray-50">
+    <div className="relative flex h-screen flex-col bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between shadow-sm">
         <div className="flex items-center gap-2">
@@ -440,7 +462,10 @@ export const ChatBot = () => {
       )}
 
       {/* Messages */}
-      <div className="overflow-y-auto px-4 py-6 flex-1">
+      <div
+        ref={scrollContainerRef}
+        className="overflow-y-auto px-4 py-6 flex-1"
+      >
         <div className="max-w-3xl mx-auto space-y-4">
           {isLoadingHistory ? (
             <div className="text-center text-gray-400 mt-16">
@@ -505,6 +530,17 @@ export const ChatBot = () => {
           <div ref={messagesEndRef} />
         </div>
       </div>
+
+      {/* Scroll to bottom button — floats above the input when user scrolls up */}
+      {!isAtBottom && messages.length > 0 && (
+        <button
+          onClick={scrollToBottom}
+          className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-white border border-gray-200 shadow-md text-sm text-gray-600 rounded-full hover:bg-gray-50 transition-all"
+        >
+          <IconArrowDown size={15} />
+          <span>Scroll to latest message</span>
+        </button>
+      )}
 
       {/* Input */}
       <div className="border-t border-gray-200 bg-white px-4 py-4">
