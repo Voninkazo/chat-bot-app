@@ -7,7 +7,6 @@ interface Props {
   content: string;
 }
 
-// Custom renderers for each markdown element.
 // Defined outside the component so they aren't recreated on every render.
 const components: Components = {
   // Fenced code blocks (``` language ```) get syntax highlighting.
